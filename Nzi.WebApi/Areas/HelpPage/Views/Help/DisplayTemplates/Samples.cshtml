@@ -1,0 +1,43 @@
+@using System.Net.Http.Headers
+@model Dictionary<MediaTypeHeaderValue, object>
+
+@{
+    // Group the samples into a single tab if they are the same.
+    Dictionary<string, object> samples = Model.GroupBy(pair => pair.Value).ToDictionary(
+        pair => String.Join(", ", pair.Select(m => m.Key.ToString()).ToArray()), 
+        pair => pair.Key);
+    var mediaTypes = samples.Keys;
+}
+<div>
+    @foreach( var mediaType in mediaTypes )
+    {
+        if( !mediaType.ToLower().Contains("protobuf") )
+        {
+            continue;
+        }
+
+        var sample = samples[mediaType] as Nzi.WebApi.Areas.HelpPage.TextSample;
+
+        <h4 class="sample-header">@mediaType</h4>
+        <div class="sample-content">
+            @*<span><b>Sample:</b></span>*@
+            @{
+
+                if( sample == null )
+                {
+                    <p>Sample not available.</p>
+                }
+                else
+                {
+                @*@Html.DisplayFor(s => sample);*@
+                    if( !string.IsNullOrEmpty(sample.TextExtend) )
+                    {
+                    <pre class="wrapped">@Html.DisplayFor(s => sample.TextExtend)</pre>
+                    }
+
+                    @Html.ActionLink("обть", "DownLoadProto", "Help", new { fullName = sample.Type.FullName, assemblyName = sample.Type.Assembly.ManifestModule.Name }, null);
+                }
+            }
+        </div>
+    }
+</div>
